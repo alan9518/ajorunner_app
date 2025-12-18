@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+const { colors } = require("./src/theme/colors");
 module.exports = {
   // NOTE: Update this to include the paths to all files that contain Nativewind classes.
   content: ["./app/**/*.{js, jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
@@ -7,20 +8,20 @@ module.exports = {
     extend: {
       colors: {
         background: {
-          DEFAULT: "#FFF7ED", // light
-          dark: "#18181B", // dark
+          DEFAULT: colors.light.background,
+          dark: colors.dark.background,
         },
         primary: {
-          DEFAULT: "#FB923C",
-          dark: "#EA580C",
+          DEFAULT: colors.light.primary,
+          dark: colors.dark.primary,
         },
         secondary: {
-          DEFAULT: "#F5F5F7",
-          dark: "#27272A",
+          DEFAULT: colors.light.background,
+          dark: colors.dark.background,
         },
         text: {
-          DEFAULT: "#18181B",
-          dark: "#E5E5E7",
+          DEFAULT: colors.light.text,
+          dark: colors.dark.text,
         },
       },
     },
