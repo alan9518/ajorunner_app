@@ -1,13 +1,21 @@
+import { useCallback, useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useGetCurrentLocation } from "@/src/shared/hooks/useGetCurrentLocation";
 import { useRequestLocationPermission } from "@/src/shared/hooks/useRequestLocationPermission";
+import { LocationButton } from "./LocationButton";
 
 export const GMapView = () => {
+  const mapRef = useRef<MapView>(null);
+
   const { status, requestPermission } = useRequestLocationPermission();
   const { region } = useGetCurrentLocation(status);
+
+  const onCenterPress = useCallback(() => {
+    if (!mapRef.current || !region) return;
+    mapRef.current.animateToRegion(region, 500);
+  }, [mapRef, region]);
 
   if (status !== "granted") {
     return (
@@ -25,15 +33,20 @@ export const GMapView = () => {
     );
   }
   return (
-    <SafeAreaView className="w-full h-full flex-1">
+    <View>
       <MapView
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         region={region}
         showsUserLocation
         followsUserLocation
+        showsMyLocationButton={false}
+        ref={mapRef}
       />
-    </SafeAreaView>
+      <View className="absolute bottom-28 right-4">
+        <LocationButton onPress={onCenterPress} />
+      </View>
+    </View>
   );
 };
 
@@ -42,6 +55,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     height: "100%",
+    padding: 0,
   },
   map: {
     width: "100%",
