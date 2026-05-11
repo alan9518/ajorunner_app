@@ -14,7 +14,7 @@ export const colors = {
     secondary: "#27272A",
     accent: "#FB923C",
     tabBar: "#18181B",
-    foreground: "#E5E7EB",
+    foreground: "#18181B",
     border: "#27272A",
   },
   gradients: {

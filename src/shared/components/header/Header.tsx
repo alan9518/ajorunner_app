@@ -12,8 +12,8 @@ export const HeaderRoot = ({ children }: { children: React.ReactNode }) => {
     <LinearGradient
       colors={[colors.gradients.primary[0], colors.gradients.primary[1]]}
       start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      className="w-full h-32 px-2 pt-2"
+      end={{ x: 0, y: 0.2 }}
+      className="w-full h-24 px-2 pt-2"
     >
       <View className="flex-1 flex-row items-center justify-between">
         {children}
