@@ -4,6 +4,7 @@ import React, { useCallback, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { ActivitySelector } from "../ActivitySelector/SelectorContainer";
 import { StarTrackingButton } from "../StartButton/StartTrackingButton";
+import { WelcomePill } from "../WelcomePill/WelcomePill";
 
 export const ActivityContainer = () => {
   // ref
@@ -21,7 +22,7 @@ export const ActivityContainer = () => {
       ref={bottomSheetRef}
       onChange={handleSheetChanges}
       snapPoints={snapPoints}
-      index={0}
+      index={1}
       backgroundStyle={{
         backgroundColor: colors.dark.border,
         borderTopLeftRadius: 32,
@@ -31,6 +32,7 @@ export const ActivityContainer = () => {
     >
       <BottomSheetView style={styles.contentContainer}>
         <View className="w-full flex justify-center">
+          <WelcomePill />
           <ActivitySelector />
           <StarTrackingButton />
         </View>
@@ -47,7 +49,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    padding: 36,
+    padding: 12,
     alignItems: "center",
     backgroundColor: colors.dark.border,
   },

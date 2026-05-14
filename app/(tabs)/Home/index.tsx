@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ActivityContainer } from "./components/ActivityContainer/ActivityContainer";
 import { GMapView } from "./components/GMapView/GMapView";
 import { HomeHeader } from "./components/HomeHeader/HomeHeader";
+import { TrackingModal } from "./components/TrackingModal/TrackingModal";
 
 const Home = () => {
   return (
@@ -18,6 +19,7 @@ const Home = () => {
         </View>
         <ActivityContainer />
       </SafeAreaView>
+      <TrackingModal />
     </GestureHandlerRootView>
   );
 };
