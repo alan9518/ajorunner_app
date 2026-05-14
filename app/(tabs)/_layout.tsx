@@ -22,23 +22,72 @@ const _Layout = () => {
           overflow: "hidden",
           position: "absolute",
           borderTopWidth: 0,
-          paddingTop: 20,
+          paddingTop: 12,
+          paddingBottom: 24,
         },
         tabBarItemStyle: tabBarItemStyle,
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: colors.dark.accent,
+        tabBarInactiveTintColor: colors.dark.inactiveTab,
+        tabBarLabelStyle: {
+          fontFamily: "Lexend_700Bold",
+          fontSize: 10,
+          marginTop: 4,
+        },
       }}
     >
       <Tabs.Screen
-        name="Home/index"
+        name="Home"
         options={{
           title: "Home",
           headerShown: false,
-          tabBarShowLabel: false,
           tabBarIcon: ({ focused }) => (
             <FeatherIcons
               name="home"
-              size={22}
-              color={focused ? colors.dark.accent : "white"}
-              className="w-full h-full"
+              size={24}
+              color={focused ? colors.dark.accent : colors.dark.inactiveTab}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Explore/index"
+        options={{
+          title: "Explore",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <FeatherIcons
+              name="map"
+              size={24}
+              color={focused ? colors.dark.accent : colors.dark.inactiveTab}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="History/index"
+        options={{
+          title: "History",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <FeatherIcons
+              name="clock"
+              size={24}
+              color={focused ? colors.dark.accent : colors.dark.inactiveTab}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Profile/index"
+        options={{
+          title: "Profile",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <FeatherIcons
+              name="user"
+              size={24}
+              color={focused ? colors.dark.accent : colors.dark.inactiveTab}
             />
           ),
         }}
