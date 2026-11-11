@@ -1,10 +1,19 @@
 import { useRouter } from "expo-router";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
-import { useHomeStore } from "../../stores/useHomeStore";
+import { useActivityStore } from "../../activity/stores/useActivityStore";
 
 export const TrackingModal = () => {
   const router = useRouter();
-  const { setShowModal, setIsTracking, showModal, isTracking } = useHomeStore();
+  //   const { setShowModal, setIsTracking, showModal, isTracking } = useHomeStore();
+  const {
+    currentRun,
+    showModal,
+    setShowModal,
+    setstartRun,
+    pauseRun,
+    resumeRun,
+    finishRun,
+  } = useActivityStore();
 
   return (
     <Modal visible={showModal} transparent animationType="fade">
@@ -22,7 +31,7 @@ export const TrackingModal = () => {
               className="bg-primary w-full h-14 rounded-full flex items-center justify-center"
               onPress={() => {
                 setShowModal(false);
-                setIsTracking(false);
+                finishRun();
                 router.push("/(tabs)/Home/screens/Summary/Summary");
               }}
             >
@@ -35,7 +44,7 @@ export const TrackingModal = () => {
               className="bg-gray-800 w-full h-14 rounded-full flex items-center justify-center"
               onPress={() => {
                 setShowModal(false);
-                setIsTracking(false);
+                pauseRun();
               }}
             >
               <Text className="text-white font-lexend-bold text-lg">Pause</Text>

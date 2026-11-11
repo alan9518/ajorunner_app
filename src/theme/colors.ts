@@ -7,6 +7,7 @@ export const colors = {
     tabBar: "#FFF7ED",
     foreground: "#18181B",
     border: "#E4E4E7",
+    inactiveTab: "#9ca3af",
   },
   dark: {
     background: "#18181B",
@@ -16,6 +17,7 @@ export const colors = {
     tabBar: "#18181B",
     foreground: "#18181B",
     border: "#27272A",
+    inactiveTab: "#9ca3af",
   },
   gradients: {
     primary: ["rgba(24, 24, 27, 0.9)", "rgba(24, 24, 27, 0.3)"],

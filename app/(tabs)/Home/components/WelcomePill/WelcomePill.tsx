@@ -1,11 +1,11 @@
 import { Image, Text, TouchableWithoutFeedback, View } from "react-native";
-import { useHomeStore } from "../../stores/useHomeStore";
+import { useActivityStore } from "../../activity/stores/useActivityStore";
 
 export const WelcomePill = () => {
-  const { loadFakeRoute } = useHomeStore();
+  const { loadFakeRun } = useActivityStore();
 
   return (
-    <TouchableWithoutFeedback onPress={loadFakeRoute}>
+    <TouchableWithoutFeedback onPress={loadFakeRun}>
       <View className="w-full flex-row items-center bg-background-dark rounded-full px-4 py-4 mb-6">
         <View className="w-12 h-12 rounded-full border-2 border-gray-600 overflow-hidden mr-4">
           <Image

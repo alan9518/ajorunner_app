@@ -8,27 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "@/src/shared/components/header";
 import { HeaderLeft } from "@/src/shared/components/header/Header";
 import { colors } from "@/src/theme/colors";
-import { useHomeStore } from "../../stores/useHomeStore";
-
-// Helper to calculate distance between two coordinates in km
-const getDistanceFromLatLonInKm = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-) => {
-  const R = 6371; // Radius of the earth in km
-  const dLat = (lat2 - lat1) * (Math.PI / 180);
-  const dLon = (lon2 - lon1) * (Math.PI / 180);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
+import { useActivityStore } from "../../activity/stores/useActivityStore";
 
 // Helper to format ms into mm:ss
 const formatTime = (ms: number) => {
@@ -40,57 +20,17 @@ const formatTime = (ms: number) => {
 
 export default function SummaryScreen() {
   const router = useRouter();
-  const { route, clearRoute } = useHomeStore();
-  console.log("🚀 ~ SummaryScreen ~ route:", route);
+  const { currentRun, completedRuns, clearCurrentRun } = useActivityStore();
 
-  const stats = useMemo(() => {
-    if (route.length < 2) {
-      return {
-        distance: 0,
-        durationMs: 0,
-        pace: 0,
-        avgSpeed: 0,
-        maxAltitude: 0,
-      };
-    }
-
-    let distance = 0;
-    let maxAltitude = route[0].altitude || 0;
-
-    // Sum distance between points
-    for (let i = 1; i < route.length; i++) {
-      const prev = route[i - 1];
-      const curr = route[i];
-      distance += getDistanceFromLatLonInKm(
-        prev.latitude,
-        prev.longitude,
-        curr.latitude,
-        curr.longitude,
-      );
-      if (curr.altitude && curr.altitude > maxAltitude) {
-        maxAltitude = curr.altitude;
-      }
-    }
-
-    // Duration based on timestamps
-    const durationMs = route[route.length - 1].timestamp - route[0].timestamp;
-
-    // Pace: minutes per km
-    const durationMinutes = durationMs / 1000 / 60;
-    const pace = distance > 0 ? durationMinutes / distance : 0;
-
-    // Avg speed: m/s to km/h
-    const avgSpeed = distance > 0 ? distance / (durationMinutes / 60) : 0;
-
-    return { distance, durationMs, pace, avgSpeed, maxAltitude };
-  }, [route]);
+  // If there's a finished run in currentRun, use it, otherwise use the last completed run
+  const runToDisplay = currentRun || completedRuns[completedRuns.length - 1];
 
   const mapRegion = useMemo(() => {
-    if (route.length === 0) return undefined;
+    if (!runToDisplay || runToDisplay.route.length === 0) return undefined;
 
     // Find min/max to center map
-    const lats = route.map((p) => p.latitude);
-    const lons = route.map((p) => p.longitude);
+    const lats = runToDisplay.route.map((p) => p.latitude);
+    const lons = runToDisplay.route.map((p) => p.longitude);
     const minLat = Math.min(...lats);
     const maxLat = Math.max(...lats);
     const minLon = Math.min(...lons);
@@ -102,12 +42,17 @@ export default function SummaryScreen() {
       latitudeDelta: (maxLat - minLat) * 1.5 || 0.01,
       longitudeDelta: (maxLon - minLon) * 1.5 || 0.01,
     };
-  }, [route]);
+  }, [runToDisplay]);
 
   const handleClose = () => {
-    clearRoute(); // Reset the tracking route
+    clearCurrentRun(); // Reset the tracking route
     router.back();
   };
+
+  if (!runToDisplay) return null;
+
+  const stats = runToDisplay.stats;
+  const route = runToDisplay.route;
 
   return (
     <SafeAreaView className="flex-1 bg-background-dark px-4">
@@ -144,65 +89,69 @@ export default function SummaryScreen() {
         </View>
 
         {/* Stats Container */}
-        <View className=" mt-8 flex-row flex-wrap justify-between">
-          <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
-            <FontAwesome5
-              name="route"
-              size={24}
-              color={colors.light.primary}
-              className="mb-2"
-            />
-            <Text className="text-gray-400 font-lexend text-sm mt-2">
-              Distance
-            </Text>
-            <Text className="text-white font-lexend-bold text-xl">
-              {stats.distance.toFixed(2)} km
-            </Text>
-          </View>
+        {stats && (
+          <View className=" mt-8 flex-row flex-wrap justify-between">
+            <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
+              <FontAwesome5
+                name="route"
+                size={24}
+                color={colors.light.primary}
+                className="mb-2"
+              />
+              <Text className="text-gray-400 font-lexend text-sm mt-2">
+                Distance
+              </Text>
+              <Text className="text-white font-lexend-bold text-xl">
+                {stats?.distanceMeters?.toFixed(2)} km
+              </Text>
+            </View>
 
-          <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
-            <FontAwesome5
-              name="stopwatch"
-              size={24}
-              color={colors.light.primary}
-              className="mb-2"
-            />
-            <Text className="text-gray-400 font-lexend text-sm mt-2">Time</Text>
-            <Text className="text-white font-lexend-bold text-xl">
-              {formatTime(stats.durationMs)}
-            </Text>
-          </View>
+            <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
+              <FontAwesome5
+                name="stopwatch"
+                size={24}
+                color={colors.light.primary}
+                className="mb-2"
+              />
+              <Text className="text-gray-400 font-lexend text-sm mt-2">
+                Time
+              </Text>
+              <Text className="text-white font-lexend-bold text-xl">
+                {formatTime(stats.durationMs)}
+              </Text>
+            </View>
 
-          <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
-            <FontAwesome5
-              name="tachometer-alt"
-              size={24}
-              color={colors.light.primary}
-              className="mb-2"
-            />
-            <Text className="text-gray-400 font-lexend text-sm mt-2">
-              Avg Pace
-            </Text>
-            <Text className="text-white font-lexend-bold text-xl">
-              {formatTime(stats.pace * 60 * 1000)} /km
-            </Text>
-          </View>
+            <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
+              <FontAwesome5
+                name="tachometer-alt"
+                size={24}
+                color={colors.light.primary}
+                className="mb-2"
+              />
+              <Text className="text-gray-400 font-lexend text-sm mt-2">
+                Avg Pace
+              </Text>
+              <Text className="text-white font-lexend-bold text-xl">
+                {formatTime(stats.avgPace * 60 * 1000)} /km
+              </Text>
+            </View>
 
-          <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
-            <FontAwesome5
-              name="mountain"
-              size={24}
-              color={colors.light.primary}
-              className="mb-2"
-            />
-            <Text className="text-gray-400 font-lexend text-sm mt-2">
-              Max Elev.
-            </Text>
-            <Text className="text-white font-lexend-bold text-xl">
-              {stats.maxAltitude.toFixed(0)} m
-            </Text>
+            <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
+              <FontAwesome5
+                name="mountain"
+                size={24}
+                color={colors.light.primary}
+                className="mb-2"
+              />
+              <Text className="text-gray-400 font-lexend text-sm mt-2">
+                Max Elev.
+              </Text>
+              <Text className="text-white font-lexend-bold text-xl">
+                {stats.maxAltitude.toFixed(0)} m
+              </Text>
+            </View>
           </View>
-        </View>
+        )}
 
         <TouchableOpacity
           className="bg-primary mx-4 mt-4 h-16 rounded-full flex items-center justify-center"

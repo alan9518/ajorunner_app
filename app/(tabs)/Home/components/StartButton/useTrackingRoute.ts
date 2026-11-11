@@ -1,41 +1,33 @@
 import * as Location from "expo-location";
 import { useEffect, useRef } from "react";
-
-import { RoutePoint, useHomeStore } from "../../stores/useHomeStore";
+import {
+  RoutePoint,
+  useActivityStore,
+} from "../../activity/stores/useActivityStore";
 
 export const useTrackingRoute = () => {
-  const { isTracking, addRoutePoint } = useHomeStore();
+  const { currentRun, addRoutePoint } = useActivityStore();
+
+  const isTracking = currentRun?.status === "running";
 
   const subscriptionRef = useRef<Location.LocationSubscription | null>(null);
 
   useEffect(() => {
-    const startTracking = async () => {
+    const startTrackingLocation = async () => {
       try {
-        // Prevent duplicate subscriptions
-        if (subscriptionRef.current) {
-          return;
-        }
+        if (subscriptionRef.current) return;
 
-        // Check permissions
         const { status } = await Location.getForegroundPermissionsAsync();
-
         if (status !== "granted") {
           console.warn("Location permission not granted");
           return;
         }
 
-        // Start GPS tracking
         subscriptionRef.current = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.BestForNavigation,
-
-            // Update every second
             timeInterval: 1000,
-
-            // Or every meter moved
             distanceInterval: 1,
-
-            // Android-specific
             mayShowUserSettingsDialog: true,
           },
           (location) => {
@@ -60,7 +52,7 @@ export const useTrackingRoute = () => {
       }
     };
 
-    const stopTracking = () => {
+    const stopTrackingLocation = () => {
       if (subscriptionRef.current) {
         subscriptionRef.current.remove();
         subscriptionRef.current = null;
@@ -68,13 +60,13 @@ export const useTrackingRoute = () => {
     };
 
     if (isTracking) {
-      startTracking();
+      startTrackingLocation();
     } else {
-      stopTracking();
+      stopTrackingLocation();
     }
 
     return () => {
-      stopTracking();
+      stopTrackingLocation();
     };
   }, [isTracking, addRoutePoint]);
 };

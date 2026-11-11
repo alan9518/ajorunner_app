@@ -1,8 +1,9 @@
 import { View } from "react-native";
-import { useHomeStore } from "../../stores/useHomeStore";
+import { useActivityStore } from "../../activity/stores/useActivityStore";
+import { ActivityType } from "../../activity/types";
 import { SelectorItem } from "./SelectorItem";
 
-const ACTIVITIES = [
+const ACTIVITIES: { title: ActivityType; icon: string }[] = [
   {
     title: "Run",
     icon: "running",
@@ -10,12 +11,11 @@ const ACTIVITIES = [
   {
     title: "Walk",
     icon: "walking",
-    
   },
 ];
 
 export const ActivitySelector = () => {
-  const { selectedActivity, setSelectedActivity } = useHomeStore();
+  const { selectedActivity, setSelectedActivity } = useActivityStore();
 
   return (
     <View className="w-full flex-row justify-around mb-4 bg-background-dark p-1 rounded-full">
@@ -25,7 +25,7 @@ export const ActivitySelector = () => {
           title={activity.title}
           icon={activity.icon}
           isActive={selectedActivity === activity.title}
-          onPress={() => setSelectedActivity(activity.title as "Run" | "Walk")}
+          onPress={() => setSelectedActivity(activity.title)}
         />
       ))}
     </View>

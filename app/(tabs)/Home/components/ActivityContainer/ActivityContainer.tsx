@@ -28,7 +28,7 @@ export const ActivityContainer = () => {
         borderTopLeftRadius: 32,
         borderTopRightRadius: 32,
       }}
-      handleIndicatorStyle={{ backgroundColor: "#52525B" }}
+      handleIndicatorStyle={{ backgroundColor: colors.dark.inactiveTab }}
     >
       <BottomSheetView style={styles.contentContainer}>
         <View className="w-full flex justify-center">

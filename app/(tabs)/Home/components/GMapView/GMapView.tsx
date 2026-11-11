@@ -5,15 +5,19 @@ import MapView, { PROVIDER_GOOGLE, Polyline } from "react-native-maps";
 import { useGetCurrentLocation } from "@/src/shared/hooks/useGetCurrentLocation";
 import { useRequestLocationPermission } from "@/src/shared/hooks/useRequestLocationPermission";
 import { colors } from "@/src/theme/colors";
-import { useHomeStore } from "../../stores/useHomeStore";
+import { useActivityStore } from "../../activity/stores/useActivityStore";
 import { LocationButton } from "./LocationButton";
 
 export const GMapView = () => {
   const mapRef = useRef<MapView>(null);
 
   const { status, requestPermission } = useRequestLocationPermission();
+  console.log("🚀 ~ GMapView ~ status:", status);
   const { region } = useGetCurrentLocation(status);
-  const route = useHomeStore((state) => state.route);
+  console.log("🚀 ~ GMapView ~ region:", region);
+  const route = useActivityStore(
+    (state) => state.currentRun?.route || undefined,
+  );
 
   const onCenterPress = useCallback(() => {
     if (!mapRef.current || !region) return;
@@ -46,7 +50,7 @@ export const GMapView = () => {
         showsMyLocationButton={false}
         ref={mapRef}
       >
-        {route.length > 0 && (
+        {route && route.length > 0 && (
           <Polyline
             coordinates={route}
             strokeColor={colors.light.primary} // Orange line for the route
