@@ -34,7 +34,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       {/* Root background */}
       <View className="flex-1">
-        <StatusBar style="auto" translucent={true} animated={true} />
+        <StatusBar style="auto" animated={true} />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
         </Stack>

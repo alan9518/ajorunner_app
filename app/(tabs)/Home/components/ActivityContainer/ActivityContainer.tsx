@@ -1,6 +1,6 @@
 import { colors } from "@/src/theme/colors";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
 import { ActivitySelector } from "../ActivitySelector/SelectorContainer";
 import { StarTrackingButton } from "../StartButton/StartTrackingButton";
@@ -22,7 +22,7 @@ export const ActivityContainer = () => {
       ref={bottomSheetRef}
       onChange={handleSheetChanges}
       snapPoints={snapPoints}
-      index={1}
+      index={0}
       backgroundStyle={{
         backgroundColor: colors.dark.border,
         borderTopLeftRadius: 32,
