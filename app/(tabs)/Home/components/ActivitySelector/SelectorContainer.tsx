@@ -1,16 +1,12 @@
 import { View } from "react-native";
 import { useActivityStore } from "../../activity/stores/useActivityStore";
-import { ActivityType } from "../../activity/types";
+import { ActivityType } from "../../activity/types/types";
 import { SelectorItem } from "./SelectorItem";
 
 const ACTIVITIES: { title: ActivityType; icon: string }[] = [
   {
     title: "Run",
     icon: "running",
-  },
-  {
-    title: "Walk",
-    icon: "walking",
   },
 ];
 

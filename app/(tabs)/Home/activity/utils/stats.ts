@@ -1,4 +1,4 @@
-import { RoutePoint, RunStats } from "../types";
+import type { RoutePoint, RunStats } from "../types/types";
 
 export const getDistanceFromLatLonInKm = (
   lat1: number,
@@ -69,9 +69,9 @@ export const calculateRunStats = (route: RoutePoint[]): RunStats => {
   const maxAltitude = calculateMaxAltitude(route);
 
   return {
-    distance,
+    distanceMeters: distance * 1000,
     durationMs,
-    pace,
+    avgPace: pace,
     avgSpeed,
     maxAltitude,
   };

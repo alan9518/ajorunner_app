@@ -1,6 +1,6 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Polyline } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,17 +10,13 @@ import { HeaderLeft } from "@/src/shared/components/header/Header";
 import { colors } from "@/src/theme/colors";
 import { useActivityStore } from "../../activity/stores/useActivityStore";
 
-// Helper to format ms into mm:ss
-const formatTime = (ms: number) => {
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-};
+// Smallest map span (degrees, about 100 m) so very short routes stay visible
+const MIN_MAP_DELTA = 0.001;
 
 export default function SummaryScreen() {
   const router = useRouter();
   const { currentRun, completedRuns, clearCurrentRun } = useActivityStore();
+  console.log("🚀 ~ SummaryScreen ~ currentRun:", currentRun);
 
   // If there's a finished run in currentRun, use it, otherwise use the last completed run
   const runToDisplay = currentRun || completedRuns[completedRuns.length - 1];
@@ -39,8 +35,8 @@ export default function SummaryScreen() {
     return {
       latitude: (minLat + maxLat) / 2,
       longitude: (minLon + maxLon) / 2,
-      latitudeDelta: (maxLat - minLat) * 1.5 || 0.01,
-      longitudeDelta: (maxLon - minLon) * 1.5 || 0.01,
+      latitudeDelta: Math.max((maxLat - minLat) * 1.5, MIN_MAP_DELTA),
+      longitudeDelta: Math.max((maxLon - minLon) * 1.5, MIN_MAP_DELTA),
     };
   }, [runToDisplay]);
 
@@ -88,68 +84,53 @@ export default function SummaryScreen() {
           </MapView>
         </View>
 
-        {/* Stats Container */}
+        {/* Stats Container: recorded values, 2 decimals */}
         {stats && (
           <View className=" mt-8 flex-row flex-wrap justify-between">
-            <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
-              <FontAwesome5
-                name="route"
-                size={24}
-                color={colors.light.primary}
-                className="mb-2"
-              />
-              <Text className="text-gray-400 font-lexend text-sm mt-2">
-                Distance
-              </Text>
-              <Text className="text-white font-lexend-bold text-xl">
-                {stats?.distanceMeters?.toFixed(2)} km
-              </Text>
-            </View>
-
-            <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
-              <FontAwesome5
-                name="stopwatch"
-                size={24}
-                color={colors.light.primary}
-                className="mb-2"
-              />
-              <Text className="text-gray-400 font-lexend text-sm mt-2">
-                Time
-              </Text>
-              <Text className="text-white font-lexend-bold text-xl">
-                {formatTime(stats.durationMs)}
-              </Text>
-            </View>
-
-            <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
-              <FontAwesome5
-                name="tachometer-alt"
-                size={24}
-                color={colors.light.primary}
-                className="mb-2"
-              />
-              <Text className="text-gray-400 font-lexend text-sm mt-2">
-                Avg Pace
-              </Text>
-              <Text className="text-white font-lexend-bold text-xl">
-                {formatTime(stats.avgPace * 60 * 1000)} /km
-              </Text>
-            </View>
-
-            <View className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center">
-              <FontAwesome5
-                name="mountain"
-                size={24}
-                color={colors.light.primary}
-                className="mb-2"
-              />
-              <Text className="text-gray-400 font-lexend text-sm mt-2">
-                Max Elev.
-              </Text>
-              <Text className="text-white font-lexend-bold text-xl">
-                {stats.maxAltitude.toFixed(0)} m
-              </Text>
-            </View>
+            {[
+              {
+                label: "Distance",
+                icon: "route",
+                value: `${stats.distanceMeters.toFixed(2)} m`,
+              },
+              {
+                label: "Time",
+                icon: "stopwatch",
+                value: `${(stats.durationMs / 1000).toFixed(2)} s`,
+              },
+              {
+                label: "Avg Pace",
+                icon: "tachometer-alt",
+                value: `${stats.avgPace.toFixed(2)} min/km`,
+              },
+              {
+                label: "Avg Speed",
+                icon: "running",
+                value: `${stats.avgSpeed.toFixed(2)} km/h`,
+              },
+            ].map((stat) => (
+              <View
+                key={stat.label}
+                className="w-[48%] bg-gray-800 p-4 rounded-3xl mb-4 items-center"
+              >
+                <FontAwesome5
+                  name={stat.icon}
+                  size={24}
+                  color={colors.light.primary}
+                  className="mb-2"
+                />
+                <Text className="text-gray-400 font-lexend text-sm mt-2">
+                  {stat.label}
+                </Text>
+                <Text
+                  className="text-white font-lexend-bold text-xl"
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  {stat.value}
+                </Text>
+              </View>
+            ))}
           </View>
         )}
 

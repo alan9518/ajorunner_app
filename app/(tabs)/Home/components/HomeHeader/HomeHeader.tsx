@@ -5,7 +5,7 @@ export const HomeHeader = () => {
     <Header>
       <Header.Left>
         <Header.Avatar />
-        <Header.Titles greeting="Welcome " name="Runner" />
+        <Header.Titles greeting="Welcome" name="Runner" />
       </Header.Left>
       <Header.Right>
         <Header.Actions>

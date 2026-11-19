@@ -1,43 +1,62 @@
-import { Run, RoutePoint, ActivityType } from "../types";
-import { calculateRunStats } from "./stats";
+import type { RoutePoint } from "../types/types";
 
-export const generateFakeRun = (activityType: ActivityType = "Run"): Run => {
-  const points: RoutePoint[] = [];
-  // Guadalajara downtown approximate coordinates
-  let lat = 20.676667;
-  let lon = -103.3475;
-  const startTime = Date.now() - 5 * 60 * 1000; // 5 mins ago
+/** Area enclosed by the fake route, in square meters. */
+export const FAKE_RUN_AREA_SQ_M = 200;
 
-  for (let i = 0; i < 60; i++) {
-    // 60 points = 5 minutes if each point is 5s apart. Moving in a block shape.
-    if (i < 15) lat += 0.0002; // North
-    else if (i < 30) lon += 0.0002; // East
-    else if (i < 45) lat -= 0.0002; // South
-    else lon -= 0.0002; // West
+/** Easy jogging pace: 2.5 m/s is about 9 km/h (6:40 min/km). */
+export const FAKE_RUN_SPEED_MS = 2.5;
 
-    points.push({
-      latitude: lat,
-      longitude: lon,
-      timestamp: startTime + i * 5000, // +5 seconds per point
-      accuracy: 5,
-      speed: 2.5, // 2.5 m/s
-      heading: 0,
-      altitude: 1566, // Guadalajara approximate altitude
-    });
-  }
+/** Time between emitted points. */
+export const FAKE_RUN_POINT_INTERVAL_MS = 1000;
 
-  const run: Run = {
-    id: Math.random().toString(36).substring(2, 9),
-    activityType,
-    startedAt: points[0].timestamp,
-    endedAt: points[points.length - 1].timestamp,
-    status: "completed",
-    route: points,
-    stats: calculateRunStats(points),
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    synced: false,
+const EARTH_RADIUS_M = 6371000;
+
+/**
+ * Points of a square of FAKE_RUN_AREA_SQ_M that starts and finishes at
+ * `start` (one corner of the square). It goes north, east, south, then west,
+ * one point every FAKE_RUN_POINT_INTERVAL_MS at FAKE_RUN_SPEED_MS, and the
+ * last point is exactly `start`.
+ * Timestamps are left as 0: the caller stamps each point when it emits it.
+ */
+export const generateSquarePoints = (start: {
+  latitude: number;
+  longitude: number;
+}): RoutePoint[] => {
+  const side = Math.sqrt(FAKE_RUN_AREA_SQ_M);
+  const perimeter = 4 * side;
+  const stepM = FAKE_RUN_SPEED_MS * (FAKE_RUN_POINT_INTERVAL_MS / 1000);
+
+  const metersToLat = (m: number) => (m / EARTH_RADIUS_M) * (180 / Math.PI);
+  const metersToLon = (m: number) =>
+    (m / (EARTH_RADIUS_M * Math.cos((start.latitude * Math.PI) / 180))) *
+    (180 / Math.PI);
+
+  // Offsets in meters (north, east) from the start corner, and the heading
+  // of the edge, for a distance `d` walked along the perimeter.
+  const positionAt = (d: number) => {
+    if (d < side) return { north: d, east: 0, heading: 0 };
+    if (d < 2 * side) return { north: side, east: d - side, heading: 90 };
+    if (d < 3 * side)
+      return { north: 3 * side - d, east: side, heading: 180 };
+    return { north: 0, east: 4 * side - d, heading: 270 };
   };
 
-  return run;
+  const points: RoutePoint[] = [];
+  const steps = Math.ceil(perimeter / stepM);
+  for (let i = 0; i <= steps; i++) {
+    const d = Math.min(i * stepM, perimeter);
+    // At the very end, snap to the start so the square closes exactly.
+    const { north, east, heading } =
+      d >= perimeter ? { north: 0, east: 0, heading: 270 } : positionAt(d);
+    points.push({
+      latitude: start.latitude + metersToLat(north),
+      longitude: start.longitude + metersToLon(east),
+      timestamp: 0,
+      accuracy: 5,
+      speed: FAKE_RUN_SPEED_MS,
+      heading,
+      altitude: null,
+    });
+  }
+  return points;
 };

@@ -2,13 +2,13 @@ import { colors } from "@/src/theme/colors";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useActivityStore } from "../../activity/stores/useActivityStore";
-import { useTrackingRoute } from "./useTrackingRoute";
+import { useDummyTrackingRoute } from "./useDummyTrackingRoute";
 
 export const StarTrackingButton = () => {
-  const { setShowModal, currentRun, startRun, resumeRun } = useActivityStore();
+  const { setShowModal, currentRun, resumeRun } = useActivityStore();
 
-  // Initialize tracking hook
-  useTrackingRoute();
+  // Dummy tracking (swap for useTrackingRoute() to use the real GPS)
+  const { startDummyRun } = useDummyTrackingRoute();
 
   const isTracking = currentRun?.status === "running";
   const isPaused = currentRun?.status === "paused";
@@ -20,7 +20,7 @@ export const StarTrackingButton = () => {
     } else if (isPaused) {
       resumeRun();
     } else {
-      startRun();
+      startDummyRun();
     }
   };
 
@@ -28,7 +28,7 @@ export const StarTrackingButton = () => {
     <>
       <TouchableOpacity
         activeOpacity={0.8}
-        className="w-full mt-4"
+        className="w-full my-2"
         onPress={handlePress}
       >
         <View

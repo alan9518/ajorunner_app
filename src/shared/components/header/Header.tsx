@@ -12,10 +12,10 @@ export const HeaderRoot = ({ children }: { children: React.ReactNode }) => {
     <LinearGradient
       colors={[colors.gradients.primary[0], colors.gradients.primary[1]]}
       start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 0.2 }}
-      className="w-full h-24 px-2 pt-2"
+      end={{ x: 0, y: 0.9 }}
+      className="w-full h-32 px-2"
     >
-      <View className="flex-1 flex-row items-center justify-between">
+      <View className="flex-1 flex-row items-center justify-between py-2">
         {children}
       </View>
     </LinearGradient>
@@ -25,7 +25,7 @@ export const HeaderRoot = ({ children }: { children: React.ReactNode }) => {
 /* -------------------- Slots -------------------- */
 
 export const HeaderLeft = ({ children }: { children: React.ReactNode }) => {
-  return <View className="flex flex-row items-center">{children}</View>;
+  return <View className="flex flex-row items-center px-2">{children}</View>;
 };
 
 export const HeaderRight = ({ children }: { children: React.ReactNode }) => {
@@ -48,9 +48,13 @@ export const HeaderTitles = ({
   name?: string;
 }) => {
   return (
-    <View className="ml-2">
-      <Text className="font-lexend-bold text-xl text-primary">{greeting}</Text>
-      <Text className="font-lexend-bold text-xl text-white">{name}</Text>
+    <View className="ml-4">
+      <Text className="font-lexend-bold text-xl leading-[22px] text-primary">
+        {greeting}
+      </Text>
+      <Text className="font-lexend-bold text-xl leading-[22px] text-white">
+        {name}
+      </Text>
     </View>
   );
 };

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type ActivityType = "Run" | "Walk";
+type ActivityType = "Run";
 
 export interface Coordinate {
   latitude: number;

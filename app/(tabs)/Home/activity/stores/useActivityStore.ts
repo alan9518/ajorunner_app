@@ -1,54 +1,8 @@
 import { create } from "zustand";
-// import { ActivityType, RoutePoint, Run } from "../types";
-import { generateFakeRun } from "../utils/fakeRun";
+import type { ActivityType, RoutePoint, Run } from "../types/types";
 import { calculateRunStats } from "../utils/stats";
 
-type ActivityType = "Run" | "Walk";
-
-export type RoutePoint = {
-  latitude: number;
-  longitude: number;
-  timestamp: number;
-  accuracy: number | null;
-  speed: number | null;
-  heading: number | null;
-  altitude: number | null;
-};
-
-export type RunStatus =
-  | "idle"
-  | "running"
-  | "paused"
-  | "completed"
-  | "syncing"
-  | "synced"
-  | "failed";
-
-export interface Run {
-  id: string;
-
-  activityType: ActivityType;
-
-  startedAt: number | null;
-  endedAt?: number | null;
-
-  status: RunStatus;
-
-  route: RoutePoint[];
-
-  stats: {
-    distanceMeters: number;
-    durationMs: number;
-    avgPace: number;
-    avgSpeed: number;
-    maxAltitude: number;
-  };
-
-  createdAt: number;
-  updatedAt: number;
-
-  synced: boolean;
-}
+export type { ActivityType, RoutePoint, Run, RunStatus } from "../types/types";
 
 interface ActivityState {
   // Domain state
@@ -72,7 +26,6 @@ interface ActivityState {
   clearCurrentRun: () => void;
 
   // Utilities
-  loadFakeRun: () => void;
 }
 
 const createInitialRun = (activityType: ActivityType): Run => ({
@@ -172,16 +125,5 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
 
   clearCurrentRun: () => {
     set({ currentRun: null });
-  },
-
-  loadFakeRun: () => {
-    set((state) => {
-      const fakeRun = generateFakeRun(state.selectedActivity);
-      console.log("🚀 ~ fakeRun:", fakeRun);
-      return {
-        currentRun: fakeRun,
-        completedRuns: [...state.completedRuns, fakeRun],
-      };
-    });
   },
 }));

@@ -9,7 +9,6 @@ export const TrackingModal = () => {
     currentRun,
     showModal,
     setShowModal,
-    setstartRun,
     pauseRun,
     resumeRun,
     finishRun,

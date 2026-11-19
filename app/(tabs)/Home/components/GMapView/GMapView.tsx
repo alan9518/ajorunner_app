@@ -1,12 +1,13 @@
 import { useCallback, useRef } from "react";
 import { Button, StyleSheet, Text, View } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Polyline } from "react-native-maps";
+import MapView, { Circle, PROVIDER_GOOGLE, Polyline } from "react-native-maps";
 
 import { useGetCurrentLocation } from "@/src/shared/hooks/useGetCurrentLocation";
 import { useRequestLocationPermission } from "@/src/shared/hooks/useRequestLocationPermission";
 import { colors } from "@/src/theme/colors";
 import { useActivityStore } from "../../activity/stores/useActivityStore";
 import { LocationButton } from "./LocationButton";
+import { useFollowRoute } from "./useFollowRoute";
 
 export const GMapView = () => {
   const mapRef = useRef<MapView>(null);
@@ -18,6 +19,11 @@ export const GMapView = () => {
   const route = useActivityStore(
     (state) => state.currentRun?.route || undefined,
   );
+
+  useFollowRoute(mapRef, route);
+
+  const startPoint = route?.[0];
+  const currentPoint = route?.[route.length - 1];
 
   const onCenterPress = useCallback(() => {
     if (!mapRef.current || !region) return;
@@ -55,6 +61,24 @@ export const GMapView = () => {
             coordinates={route}
             strokeColor={colors.light.primary} // Orange line for the route
             strokeWidth={4}
+          />
+        )}
+        {startPoint && (
+          <Circle
+            center={startPoint}
+            radius={1}
+            fillColor="white"
+            strokeColor={colors.light.primary}
+            strokeWidth={2}
+          />
+        )}
+        {currentPoint && route && route.length > 1 && (
+          <Circle
+            center={currentPoint}
+            radius={1.2}
+            fillColor={colors.light.primary}
+            strokeColor="white"
+            strokeWidth={2}
           />
         )}
       </MapView>

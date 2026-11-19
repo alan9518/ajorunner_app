@@ -2,14 +2,13 @@ import { colors } from "@/src/theme/colors";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useCallback, useMemo, useRef } from "react";
 import { StyleSheet, View } from "react-native";
-import { ActivitySelector } from "../ActivitySelector/SelectorContainer";
 import { StarTrackingButton } from "../StartButton/StartTrackingButton";
 import { WelcomePill } from "../WelcomePill/WelcomePill";
 
 export const ActivityContainer = () => {
   // ref
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ["50%"], []);
+  const snapPoints = useMemo(() => ["32%"], []);
 
   // callbacks
   const handleSheetChanges = useCallback((index: number) => {
@@ -23,6 +22,8 @@ export const ActivityContainer = () => {
       onChange={handleSheetChanges}
       snapPoints={snapPoints}
       index={0}
+      enableDynamicSizing={false}
+      enablePanDownToClose={false}
       backgroundStyle={{
         backgroundColor: colors.dark.border,
         borderTopLeftRadius: 32,
@@ -33,7 +34,7 @@ export const ActivityContainer = () => {
       <BottomSheetView style={styles.contentContainer}>
         <View className="w-full flex justify-center">
           <WelcomePill />
-          <ActivitySelector />
+          {/* <ActivitySelector /> */}
           <StarTrackingButton />
         </View>
       </BottomSheetView>
